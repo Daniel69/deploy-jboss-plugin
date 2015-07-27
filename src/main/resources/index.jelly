@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+  Deploy artifacts in JBoss Domain Mode and Standalone, tested in JBoss EAP 6.4 and JBoss AS 7.x.
+</div>
