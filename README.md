@@ -2,7 +2,7 @@
 
 [Jenkins](https://jenkins-ci.org/) plugin to run deploy artifacts to JBoss AS and JBoss EAP in Domain and Standalone mode.
 
-![alt tag](https://raw.github.com/Daniel69/deploy-jboss-plugin/raw/master/screnshot.png)
+![alt tag](https://raw.github.com/Daniel69/deploy-jboss-plugin/master/screnshot.png)
 
 
 #### Compilation
