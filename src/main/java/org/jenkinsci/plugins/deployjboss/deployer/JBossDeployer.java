@@ -111,9 +111,9 @@ public class JBossDeployer {
                 throw new DeploymentFailureException(
                         "Server is running in domain mode, but no server groups have been defined.");
             }
-        } else if (domain != null && !domain.getServerGroups().isEmpty()) {
+        } /*else if (domain != null && !domain.getServerGroups().isEmpty()) {
             throw new DeploymentFailureException("Server is running in standalone mode, but server groups have been defined.");
-        }
+        }*/
     }      
 
     private void close() {
