@@ -66,8 +66,10 @@ public class JBossDeploy extends Notifier{
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         try {
+            listener.getLogger().printf("Deploying artifact: %s to JBoss Server: %s, Server group: %s\n", artifact, serverName, serverGroup);
             JBossDeployer deployer = new JBossDeployer(serverName, Integer.parseInt(serverPort), username, password, serverGroup);
             deployer.deploy(getFile(artifact, build), null);
+            listener.getLogger().printf("Successful deployment!\n");
         } catch (JBossDeployerException ex) {
             ex.printStackTrace(listener.error("Error at deployment to JBoss: "));
             listener.finished(Result.UNSTABLE);
