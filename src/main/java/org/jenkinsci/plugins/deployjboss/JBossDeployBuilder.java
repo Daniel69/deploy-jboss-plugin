@@ -33,16 +33,13 @@ import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
-import hudson.tasks.Publisher;
-import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
-import javax.servlet.ServletException;
+import java.util.List;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.deployjboss.deployer.JBossDeployer;
 import org.jenkinsci.plugins.deployjboss.deployer.JBossDeployerException;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -51,12 +48,8 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class JBossDeployBuilder extends Builder{
     
-    private final String artifact;
-    private final String serverGroup;
-    private final String serverName;
-    private final String serverPort;
-    private final String username;
-    private final String password;
+    private String artifact;
+    private String deployTarget;
 
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
@@ -66,26 +59,39 @@ public class JBossDeployBuilder extends Builder{
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         try {
-            listener.getLogger().printf("Deploying artifact: %s to JBoss Server: %s, Server group: %s\n", artifact, serverName, serverGroup);
-            JBossDeployer deployer = new JBossDeployer(serverName, Integer.parseInt(serverPort), username, password, serverGroup);
-            deployer.deploy(getFile(artifact, build), null);
+            JBossConfigItem target = getJbossTarget();
+            deploy(build, listener, 
+                    target.getServerName(), 
+                    target.getServerGroup(), target.getServerPort(), 
+                    target.getUsername(), target.getPassword());
             listener.getLogger().printf("Successful deployment!\n");
         } catch (JBossDeployerException ex) {
             ex.printStackTrace(listener.error("Error at deployment to JBoss: "));
             listener.finished(Result.UNSTABLE);
+            throw new RuntimeException(ex);
         }
         return true;
     }
     
+    private void deploy(AbstractBuild<?, ?> build, BuildListener listener, String serverName, String serverGroup, String serverPort, String username, String password) throws JBossDeployerException{
+        listener.getLogger().printf("Deploying artifact: %s to JBoss Server: %s, Server group: %s\n", artifact, serverName, serverGroup);
+        JBossDeployer deployer = new JBossDeployer(serverName, Integer.parseInt(serverPort), username, password, serverGroup);
+        deployer.deploy(getFile(artifact, build), null);        
+    }
+    
+    public JBossConfigItem getJbossTarget(){
+        for(JBossConfigItem item : getDescriptor().getTargets()){
+            if(item.getName().equals(deployTarget))
+                return item;
+        }
+        return null;
+    }
+    
     @DataBoundConstructor
-    public JBossDeployBuilder(String artifact, String serverGroup, String serverName, String serverPort, String username, String password) {
+    public JBossDeployBuilder(String artifact, String deployTarget) {
         this.artifact = artifact;
-        this.serverGroup = serverGroup;
-        this.serverName = serverName;
-        this.serverPort = serverPort;
-        this.username = username;
-        this.password = password;
-    }    
+        this.deployTarget = deployTarget;
+    }        
 
     private File getFile(String artifact, AbstractBuild<?, ?> build) {
         try {
@@ -94,6 +100,11 @@ public class JBossDeployBuilder extends Builder{
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } 
+    }
+
+    @Override
+    public DescriptorImpl getDescriptor() {
+        return (DescriptorImpl) super.getDescriptor();
     }
     
     /**
@@ -109,24 +120,10 @@ public class JBossDeployBuilder extends Builder{
          */
         public DescriptorImpl() {
             load();
-        }
-
-        public FormValidation doCheckArtifact(@QueryParameter String value)   throws IOException, ServletException {
-            if (!value.toLowerCase().matches(".*(\\.ear|\\.war|\\.jar)"))
-                return FormValidation.error("Please specify a valid artifact (.war, .ear, .jar)");
-            return FormValidation.ok();
-        }
+        }   
         
-        public FormValidation doCheckServerIp(@QueryParameter String value)  throws IOException, ServletException {
-            if (value.isEmpty())
-                return FormValidation.error("Please specify a server name");
-            return FormValidation.ok();
-        }        
-
-        public FormValidation doCheckServerPort(@QueryParameter String value)  throws IOException, ServletException {
-            if (!value.matches("\\d+"))
-                return FormValidation.error("Please a valid server port");
-            return FormValidation.ok();
+        public List<JBossConfigItem> getTargets() {
+            return JBossConfig.get().getSetupConfigItems();
         }        
         
         
@@ -152,28 +149,20 @@ public class JBossDeployBuilder extends Builder{
             return super.configure(req,formData);
         }
     }   
-    
+
     public String getArtifact() {
         return artifact;
     }
 
-    public String getServerGroup() {
-        return serverGroup;
+    public void setArtifact(String artifact) {
+        this.artifact = artifact;
     }
 
-    public String getServerName() {
-        return serverName;
+    public String getDeployTarget() {
+        return deployTarget;
     }
 
-    public String getServerPort() {
-        return serverPort;
+    public void setDeployTarget(String deployTarget) {
+        this.deployTarget = deployTarget;
     }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }    
 }

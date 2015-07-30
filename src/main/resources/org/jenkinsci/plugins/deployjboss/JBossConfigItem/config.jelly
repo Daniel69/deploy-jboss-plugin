@@ -1,0 +1,35 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+        <f:section title="JBoss Deploy Target">
+
+              <f:entry title="Name" field="name">
+                 <f:textbox />
+             </f:entry>
+
+              <f:entry title="Server Name" field="serverName">
+                 <f:textbox />
+             </f:entry>
+
+              <f:entry title="Server Port" field="serverPort">
+                 <f:textbox />
+             </f:entry>
+
+             <f:entry title="Server Group" field="serverGroup">
+                 <f:textbox />
+             </f:entry>
+
+             <f:entry title="Manager User" field="username">
+                 <f:textbox />
+             </f:entry>
+
+             <f:entry title="Manager Password" field="password">
+                 <f:password />
+             </f:entry>
+
+             <f:entry title="">
+                 <div align="right">
+                     <f:repeatableDeleteButton/>
+                 </div>
+             </f:entry>
+        </f:section>
+</j:jelly>

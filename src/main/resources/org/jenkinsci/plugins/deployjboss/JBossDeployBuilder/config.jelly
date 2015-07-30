@@ -1,22 +1,16 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-  <f:entry title="Artifact Path" field="artifact">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="Server Group" field="serverGroup">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="Server Hostname" field="serverName">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="Server Port" field="serverPort">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="Manager Username" field="username">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="Manager Password" field="password">
-    <f:password />
-  </f:entry>
+    <f:entry title="Artifact Path" field="artifact">
+      <f:textbox />
+    </f:entry>
+
+    <f:entry title="Deploy Target" field="deployTarget">
+        <select class="setting-input" name="deployTarget">
+            <option>None</option>
+            <j:forEach var="target" items="${descriptor.targets}">
+                <f:option selected="${target.name==instance.deployTarget}">${target.name}</f:option>
+            </j:forEach>
+        </select>
+    </f:entry>
 </j:jelly>
