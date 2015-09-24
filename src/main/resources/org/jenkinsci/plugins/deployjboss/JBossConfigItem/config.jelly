@@ -14,7 +14,7 @@
                  <f:textbox />
              </f:entry>
 
-             <f:entry title="Server Group" field="serverGroup">
+             <f:entry title="Server Groups" field="serverGroup">
                  <f:textbox />
              </f:entry>
 

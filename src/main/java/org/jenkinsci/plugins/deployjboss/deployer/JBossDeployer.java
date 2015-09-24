@@ -27,6 +27,7 @@ import java.io.File;
 import org.jenkinsci.plugins.deployjboss.repackaged.MatchPatternStrategy;
 import org.jenkinsci.plugins.deployjboss.repackaged.Deployment;
 import java.io.IOException;
+import java.util.Arrays;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.client.helpers.domain.DomainClient;
 import org.jenkinsci.plugins.deployjboss.repackaged.DeploymentExecutionException;
@@ -56,7 +57,7 @@ public class JBossDeployer {
         this.username = username;
         this.password = password;
         this.domain = new Domain();
-        domain.getServerGroups().add(serverGroup);
+        domain.getServerGroups().addAll(Arrays.asList(serverGroup.split(",")));
     }
     
     public void deploy(File file, String deploymentName) throws JBossDeployerException{
